@@ -57,7 +57,7 @@ class OdrivePython:
 
         self.CPR2RAD = (2*math.pi/400000)
         self.connect_all()
-        self.startup_init()
+        self.full_init()
         self.set_gains(kp = 0.1, kd = 0.0001)
 
     def connect_all(self):
@@ -224,7 +224,6 @@ class OdrivePython:
         self.initflag=1
 
     def full_init(self,reset = True):
-        self.printErrorStates()
         if(reset):
             self.odrv.config.brake_resistance = 0
             self.axis1.motor.config.pre_calibrated = False
@@ -242,12 +241,8 @@ class OdrivePython:
             #motor calibration current
             self.axis1.motor.config.calibration_current = 4
             time.sleep(1)
-            self.printErrorStates()
             self.axis1.requested_state = AXIS_STATE_FULL_CALIBRATION_SEQUENCE
-            print('fullcalib')
-            self.printErrorStates()
             time.sleep(10)
-            self.printErrorStates()
         time.sleep(10)
         self.printErrorStates()
         self.axis1.requested_state = AXIS_STATE_IDLE
@@ -266,8 +261,7 @@ class OdrivePython:
         time.sleep(1)
 
         self.odrv.save_configuration()
-        time.sleep(2)
-        print('all done')
+        print('Calibration completed')
         self.printErrorStates()
 
     def PosMove(self,pos_setpt):
@@ -292,7 +286,7 @@ class OdrivePython:
         self.axis1.controller.pos_setpoint=pos_setpt
         
         ##Initialize Figure
-        timevar=10
+        timevar=3
         plt.ion()
         fig=plt.figure()
         plot_time = numpy.array([])
@@ -314,7 +308,6 @@ class OdrivePython:
             plt.show()
             plt.pause(0.0001) #Note this correction
             i = self.axis1.motor.current_control.Iq_measured
-            print(i)
             
 
     def VelMoveTuning(self,vel_setpt):
@@ -337,7 +330,7 @@ class OdrivePython:
         i = self.axis1.motor.current_control.Iq_measured
         plt.scatter(plot_timesetpt,plot_setpt)
         elapsed_time=0
-        while elapsed_time<10:            
+        while elapsed_time<3:            
             elapsed_time = time.time() - start_time
             plot_time = numpy.append(plot_time,elapsed_time)
             plot_setpt = numpy.append(plot_time,elapsed_time)
