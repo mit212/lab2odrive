@@ -18,11 +18,12 @@ import signal
 import sys
 import pdb
 import matplotlib.pyplot as plt
-import numpy
-#from OdrivePythonClass_2_10_2020 import Odrive
+import numpy 
+#from OdrivePythonClass import OdrivePython
 
-#mymot=Odrive('2085377D3548',1)
+
 #mymot.set_gains(1,0.0001,0,0)
+#mymot=OdrivePython('205337853548',1)
 
 
 
@@ -58,7 +59,7 @@ class OdrivePython:
         self.CPR2RAD = (2*math.pi/400000)
         self.connect_all()
         self.full_init()
-        self.set_gains(kp = 0.1, kd = 0.0001)
+        self.set_gains(0.1,  0.0001)
 
     def connect_all(self):
         #Connects to odrives of specified serial ids
@@ -291,8 +292,8 @@ class OdrivePython:
         fig=plt.figure()
         plot_time = numpy.array([])
         plot_timesetpt=numpy.arange(0,timevar,.1)
-        f=plot.timesetpt.size
-        plot_setpt=np.zeros(f)
+        f=plot_timesetpt.size
+        plot_setpt=numpy.ones(f)*pos_setpt
         plot_enc = numpy.array([])
         ##Real Time Plotting
         start_time = time.time()
@@ -320,17 +321,17 @@ class OdrivePython:
         plt.ion()
         fig=plt.figure()
         plot_time = numpy.array([])
-        
+        timevar=10
         plot_enc = numpy.array([])
         plot_timesetpt=numpy.arange(0,timevar,.1)
-        f=plot.timesetpt.size
-        plot_setpt=np.zeros(f)
+        f=plot_timesetpt.size
+        plot_setpt=numpy.ones(f)*vel_setpt
         ##Real Time Plotting
         start_time = time.time()
         i = self.axis1.motor.current_control.Iq_measured
         plt.scatter(plot_timesetpt,plot_setpt)
         elapsed_time=0
-        while elapsed_time<3:            
+        while elapsed_time<timevar:            
             elapsed_time = time.time() - start_time
             plot_time = numpy.append(plot_time,elapsed_time)
             plot_setpt = numpy.append(plot_time,elapsed_time)
