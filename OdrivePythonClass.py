@@ -284,10 +284,11 @@ class OdrivePython:
         self.axis1.requested_state=AXIS_STATE_CLOSED_LOOP_CONTROL
         self.axis1.controller.config.control_mode=CTRL_MODE_POSITION_CONTROL
         starting_pos = self.axis1.encoder.pos_estimate
+        pos_setpt += starting_pos
         self.axis1.controller.pos_setpoint=pos_setpt
         
         ##Initialize Figure
-        timevar=3
+        timevar=10
         plt.ion()
         fig=plt.figure()
         plot_time = numpy.array([])
@@ -299,17 +300,20 @@ class OdrivePython:
         start_time = time.time()
         i = self.axis1.motor.current_control.Iq_measured
         elapsed_time=0
-        plt.scatter(plot_timesetpt,plot_setpt)
+        plt.plot(plot_timesetpt,plot_setpt-starting_pos,color = 'g')
+        plt.xlabel('Time [s]')
+        plt.ylabel('Motor Shaft Position [count]')
         while elapsed_time<timevar:            
             elapsed_time = time.time() - start_time
             plot_time = numpy.append(plot_time,elapsed_time)
             plot_enc = numpy.append(plot_enc,self.axis1.encoder.pos_estimate - starting_pos)
-            plt.scatter(plot_time,plot_enc);
+            plt.plot(plot_time,plot_enc);
             i+=1;
             plt.show()
             plt.pause(0.0001) #Note this correction
             i = self.axis1.motor.current_control.Iq_measured
-            
+        
+
 
     def VelMoveTuning(self,vel_setpt):
         #100000 = quarter rev per second
@@ -329,20 +333,21 @@ class OdrivePython:
         ##Real Time Plotting
         start_time = time.time()
         i = self.axis1.motor.current_control.Iq_measured
-        plt.scatter(plot_timesetpt,plot_setpt)
+        plt.plot(plot_timesetpt,plot_setpt,color='g')
+        plt.xlabel('Time [s]')
+        plt.ylabel('Motor Shaft Velocity [count/s]')
         elapsed_time=0
         while elapsed_time<timevar:            
             elapsed_time = time.time() - start_time
             plot_time = numpy.append(plot_time,elapsed_time)
             plot_setpt = numpy.append(plot_time,elapsed_time)
             plot_enc = numpy.append(plot_enc,self.axis1.encoder.vel_estimate)
-            plt.scatter(plot_time,plot_enc);
+            plt.plot(plot_time,plot_enc);
             i+=1;
             plt.show()
             plt.pause(0.0001) #Note this correction
             i = self.axis1.motor.current_control.Iq_measured
             print(i)
-            
 
     def make_perm(self):
         self.odrv.save_configuration()
